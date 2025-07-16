@@ -19,7 +19,7 @@ import { FacilitatorGateway } from './modules/facilitator/facilitator.gateway';
     ConfigModule.forRoot({ isGlobal: true }),
     PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET,
+      secret: process.env.JWT_SECRET!,
       signOptions: { expiresIn: '24h' },
     }),
     TypeOrmModule.forRoot({
