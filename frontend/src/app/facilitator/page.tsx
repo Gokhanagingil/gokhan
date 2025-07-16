@@ -50,9 +50,7 @@ interface Event extends Omit<ApiEvent, 'triggeredAt'> {
 }
 
 const API_BASE_URL = 'http://localhost:3001/api';
-<<<<<<< HEAD
 
-=======
 const socket: Socket = io('http://localhost:3001');
 
 const formatRelativeTime = (dateString: string): string => {
@@ -96,13 +94,11 @@ const autoLogin = async (): Promise<string> => {
 };
 
 const fetchParticipants = async (): Promise<ApiParticipant[]> => {
-<<<<<<< HEAD
   let token = localStorage.getItem('token');
   if (!token) {
     token = await autoLogin();
   }
   
-=======
   const token = localStorage.getItem('token');
   const response = await fetch(`${API_BASE_URL}/participants`, {
     headers: {
@@ -114,13 +110,11 @@ const fetchParticipants = async (): Promise<ApiParticipant[]> => {
 };
 
 const fetchEvents = async (): Promise<ApiEvent[]> => {
-<<<<<<< HEAD
   let token = localStorage.getItem('token');
   if (!token) {
     token = await autoLogin();
   }
   
-=======
   const token = localStorage.getItem('token');
   const response = await fetch(`${API_BASE_URL}/events`, {
     headers: {
@@ -132,13 +126,11 @@ const fetchEvents = async (): Promise<ApiEvent[]> => {
 };
 
 const fetchScores = async (): Promise<ApiScore[]> => {
-<<<<<<< HEAD
   let token = localStorage.getItem('token');
   if (!token) {
     token = await autoLogin();
   }
   
-=======
   const token = localStorage.getItem('token');
   const response = await fetch(`${API_BASE_URL}/scores`, {
     headers: {
@@ -150,13 +142,12 @@ const fetchScores = async (): Promise<ApiScore[]> => {
 };
 
 const sendFeedback = async (participantId: string, message: string): Promise<ApiFeedback> => {
-<<<<<<< HEAD
+
   let token = localStorage.getItem('token');
   if (!token) {
     token = await autoLogin();
   }
   
-=======
   const token = localStorage.getItem('token');
   const response = await fetch(`${API_BASE_URL}/feedback`, {
     method: 'POST',
