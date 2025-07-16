@@ -12,8 +12,6 @@ import { InjectDataSource } from '@nestjs/typeorm';
 
 @ApiTags('seed')
 @Controller('seed')
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth()
 export class SeedController {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 

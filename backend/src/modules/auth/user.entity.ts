@@ -27,7 +27,7 @@ export class User {
   password: string;
 
   @ApiProperty({ enum: UserRole, description: 'User role for access control' })
-  @Column({ type: 'enum', enum: UserRole, default: UserRole.OBSERVER })
+  @Column({ type: 'varchar', enum: UserRole, default: UserRole.OBSERVER })
   role: UserRole;
 
   @CreateDateColumn()

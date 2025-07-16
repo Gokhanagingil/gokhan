@@ -25,7 +25,7 @@ export class Feedback {
   message: string;
 
   @ApiProperty({ description: 'When the feedback was sent' })
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   sentAt: Date;
 
   @ManyToOne(() => Participant, { onDelete: 'CASCADE' })

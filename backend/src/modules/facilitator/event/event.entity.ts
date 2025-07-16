@@ -28,7 +28,7 @@ export class Event {
 
   @ApiProperty({ enum: EventType, description: 'Type of the event' })
   @Column({
-    type: 'enum',
+    type: 'varchar',
     enum: EventType,
   })
   type: EventType;
@@ -42,7 +42,7 @@ export class Event {
   description: string;
 
   @ApiProperty({ description: 'When the event was triggered' })
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   triggeredAt: Date;
 
   @ApiProperty({
@@ -50,7 +50,7 @@ export class Event {
     description: 'Current status of the event',
   })
   @Column({
-    type: 'enum',
+    type: 'varchar',
     enum: EventStatus,
     default: EventStatus.OPEN,
   })

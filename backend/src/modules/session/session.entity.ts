@@ -19,15 +19,15 @@ export class Session {
   id: string;
 
   @ApiProperty({ description: 'Session start timestamp' })
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   startedAt: Date;
 
   @ApiProperty({ description: 'Session end timestamp' })
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   endedAt: Date;
 
   @ApiProperty({ enum: SessionStatus, description: 'Current session status' })
-  @Column({ type: 'enum', enum: SessionStatus, default: SessionStatus.STOPPED })
+  @Column({ type: 'varchar', enum: SessionStatus, default: SessionStatus.STOPPED })
   status: SessionStatus;
 
   @CreateDateColumn()

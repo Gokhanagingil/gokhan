@@ -29,7 +29,7 @@ export class Score {
   reason: string;
 
   @ApiProperty({ description: 'When the score was recorded' })
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   timestamp: Date;
 
   @ManyToOne(() => Participant, { onDelete: 'CASCADE' })

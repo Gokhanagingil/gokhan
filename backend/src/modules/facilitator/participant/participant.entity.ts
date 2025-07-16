@@ -28,7 +28,7 @@ export class Participant {
   role: string;
 
   @ApiProperty({ description: 'Last time the participant was active' })
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   lastActive: Date;
 
   @ApiProperty({
@@ -36,7 +36,7 @@ export class Participant {
     description: 'Current status of the participant',
   })
   @Column({
-    type: 'enum',
+    type: 'varchar',
     enum: ParticipantStatus,
     default: ParticipantStatus.ACTIVE,
   })
