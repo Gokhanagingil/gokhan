@@ -2,44 +2,167 @@
 
 import { useState, useEffect } from 'react';
 
-// Mock data types
-interface Participant {
+interface ApiParticipant {
   id: string;
   name: string;
   role: string;
   lastActive: string;
-  status: 'active' | 'inactive';
+  status: 'active' | 'inactive' | 'ai-controlled';
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface ApiEvent {
+  id: string;
+  type: 'incident' | 'request' | 'change' | 'agile-task' | 'problem';
+  title: string;
+  description: string;
+  triggeredAt: string;
+  status: 'open' | 'closed';
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface ApiScore {
+  id: string;
+  participantId: string;
+  value: number;
+  reason: string;
+  timestamp: string;
+  participant?: ApiParticipant;
+}
+
+interface ApiFeedback {
+  id: string;
+  participantId: string;
+  message: string;
+  sentAt: string;
+}
+
+interface Participant extends Omit<ApiParticipant, 'lastActive'> {
+  lastActive: string;
   score: number;
 }
 
-interface Event {
-  id: string;
-  type: 'incident' | 'request' | 'change' | 'agile-task' | 'problem';
+interface Event extends Omit<ApiEvent, 'triggeredAt'> {
   triggerTime: string;
-  status: 'open' | 'closed';
-  description: string;
 }
 
-// Mock data
-const mockParticipants: Participant[] = [
-  { id: '1', name: 'Alice Johnson', role: 'Service Manager', lastActive: '2 min ago', status: 'active', score: 85 },
-  { id: '2', name: 'Bob Smith', role: 'Incident Manager', lastActive: '5 min ago', status: 'active', score: 92 },
-  { id: '3', name: 'Carol Davis', role: 'Change Manager', lastActive: '1 min ago', status: 'active', score: 78 },
-  { id: '4', name: 'David Wilson', role: 'Problem Manager', lastActive: '15 min ago', status: 'inactive', score: 65 },
-  { id: '5', name: 'Eva Brown', role: 'Scrum Master', lastActive: '3 min ago', status: 'active', score: 88 },
-];
+const API_BASE_URL = 'http://localhost:3001';
 
-const mockEvents: Event[] = [
-  { id: '1', type: 'incident', triggerTime: '14:30', status: 'open', description: 'Server outage in production' },
-  { id: '2', type: 'request', triggerTime: '14:15', status: 'closed', description: 'New user access request' },
-  { id: '3', type: 'change', triggerTime: '14:00', status: 'open', description: 'Database migration scheduled' },
-  { id: '4', type: 'problem', triggerTime: '13:45', status: 'open', description: 'Recurring network issues' },
-];
+const formatRelativeTime = (dateString: string): string => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  
+  if (diffMins < 1) return 'just now';
+  if (diffMins < 60) return `${diffMins} min ago`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+  const diffDays = Math.floor(diffHours / 24);
+  return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+};
+
+const formatTriggerTime = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleTimeString('en-US', { 
+    hour: '2-digit', 
+    minute: '2-digit', 
+    hour12: false 
+  });
+};
+
+const fetchParticipants = async (): Promise<ApiParticipant[]> => {
+  const response = await fetch(`${API_BASE_URL}/participants`);
+  if (!response.ok) throw new Error('Failed to fetch participants');
+  return response.json();
+};
+
+const fetchEvents = async (): Promise<ApiEvent[]> => {
+  const response = await fetch(`${API_BASE_URL}/events`);
+  if (!response.ok) throw new Error('Failed to fetch events');
+  return response.json();
+};
+
+const fetchScores = async (): Promise<ApiScore[]> => {
+  const response = await fetch(`${API_BASE_URL}/scores`);
+  if (!response.ok) throw new Error('Failed to fetch scores');
+  return response.json();
+};
+
+const sendFeedback = async (participantId: string, message: string): Promise<ApiFeedback> => {
+  const response = await fetch(`${API_BASE_URL}/feedback`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      participantId,
+      message,
+    }),
+  });
+  if (!response.ok) throw new Error('Failed to send feedback');
+  return response.json();
+};
 
 export default function FacilitatorDashboard() {
-  const [timeRemaining, setTimeRemaining] = useState(3600); // 60 minutes in seconds
+  const [timeRemaining, setTimeRemaining] = useState(3600);
+  
+  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [selectedParticipant, setSelectedParticipant] = useState('all');
+  const [sendingFeedback, setSendingFeedback] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const [participantsData, eventsData, scoresData] = await Promise.all([
+          fetchParticipants(),
+          fetchEvents(),
+          fetchScores(),
+        ]);
+        
+        const scoresByParticipant = scoresData.reduce((acc, score) => {
+          if (!acc[score.participantId]) {
+            acc[score.participantId] = [];
+          }
+          acc[score.participantId].push(score.value);
+          return acc;
+        }, {} as Record<string, number[]>);
+        
+        const transformedParticipants: Participant[] = participantsData.map(p => ({
+          ...p,
+          lastActive: formatRelativeTime(p.lastActive),
+          score: scoresByParticipant[p.id] 
+            ? Math.round(scoresByParticipant[p.id].reduce((sum, score) => sum + score, 0) / scoresByParticipant[p.id].length)
+            : 0,
+        }));
+        
+        const transformedEvents: Event[] = eventsData.map(e => ({
+          ...e,
+          triggerTime: formatTriggerTime(e.triggeredAt),
+        }));
+        
+        setParticipants(transformedParticipants);
+        setEvents(transformedEvents);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch data');
+        console.error('Error fetching data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, []);
 
   // Timer countdown effect
   useEffect(() => {
@@ -77,14 +200,55 @@ export default function FacilitatorDashboard() {
   };
 
   // Handle feedback submission
-  const handleSendFeedback = () => {
-    if (feedbackMessage.trim()) {
-      // Mock feedback sending logic
-      console.log(`Sending feedback to ${selectedParticipant}: ${feedbackMessage}`);
+  const handleSendFeedback = async () => {
+    if (!feedbackMessage.trim() || selectedParticipant === 'all') {
+      return;
+    }
+    
+    try {
+      setSendingFeedback(true);
+      await sendFeedback(selectedParticipant, feedbackMessage);
       setFeedbackMessage('');
-      // In real implementation, this would call an API
+      console.log('Feedback sent successfully');
+    } catch (err) {
+      console.error('Error sending feedback:', err);
+      alert('Failed to send feedback. Please try again.');
+    } finally {
+      setSendingFeedback(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Arctic Echo - Facilitator Dashboard</h1>
+            <p className="text-gray-600">ITIL 4 & Agile Training Simulation Control Panel</p>
+          </div>
+          <div className="flex items-center justify-center h-64">
+            <div className="text-lg text-gray-600">Loading dashboard data...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Arctic Echo - Facilitator Dashboard</h1>
+            <p className="text-gray-600">ITIL 4 & Agile Training Simulation Control Panel</p>
+          </div>
+          <div className="flex items-center justify-center h-64">
+            <div className="text-lg text-red-600">Error: {error}</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -144,7 +308,7 @@ export default function FacilitatorDashboard() {
                     className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="all">All Participants</option>
-                    {mockParticipants.map((participant) => (
+                    {participants.map((participant) => (
                       <option key={participant.id} value={participant.id}>
                         {participant.name}
                       </option>
@@ -163,10 +327,10 @@ export default function FacilitatorDashboard() {
                 </div>
                 <button
                   onClick={handleSendFeedback}
-                  disabled={!feedbackMessage.trim()}
+                  disabled={!feedbackMessage.trim() || selectedParticipant === 'all' || sendingFeedback}
                   className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-md font-medium transition-colors"
                 >
-                  Send Feedback
+                  {sendingFeedback ? 'Sending...' : 'Send Feedback'}
                 </button>
               </div>
             </div>
@@ -184,7 +348,7 @@ export default function FacilitatorDashboard() {
                 Triggered Events
               </h2>
               <div className="space-y-3 max-h-96 overflow-y-auto">
-                {mockEvents.map((event) => (
+                {events.map((event) => (
                   <div key={event.id} className="border border-gray-200 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getEventTypeStyle(event.type)}`}>
@@ -219,7 +383,7 @@ export default function FacilitatorDashboard() {
                 Participant Monitor
               </h2>
               <div className="space-y-3 max-h-80 overflow-y-auto">
-                {mockParticipants.map((participant) => (
+                {participants.map((participant) => (
                   <div key={participant.id} className="border border-gray-200 rounded-lg p-3">
                     <div className="flex items-center justify-between mb-1">
                       <h3 className="font-medium text-gray-800">{participant.name}</h3>
@@ -243,7 +407,7 @@ export default function FacilitatorDashboard() {
                 Scoreboard
               </h2>
               <div className="space-y-3">
-                {mockParticipants
+                {participants
                   .sort((a, b) => b.score - a.score)
                   .map((participant, index) => (
                     <div key={participant.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
