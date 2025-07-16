@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -16,14 +17,18 @@ import {
   ApiResponse,
   ApiParam,
   ApiQuery,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { ScoreService } from './score.service';
 import { CreateScoreDto } from './dto/create-score.dto';
 import { UpdateScoreDto } from './dto/update-score.dto';
 import { Score } from './score.entity';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 
 @ApiTags('scores')
 @Controller('scores')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 export class ScoreController {
   constructor(private readonly scoreService: ScoreService) {}
 

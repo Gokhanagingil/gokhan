@@ -8,15 +8,19 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { ParticipantService } from './participant.service';
 import { CreateParticipantDto } from './dto/create-participant.dto';
 import { UpdateParticipantDto } from './dto/update-participant.dto';
 import { Participant } from './participant.entity';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 
 @ApiTags('participants')
 @Controller('participants')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 export class ParticipantController {
   constructor(private readonly participantService: ParticipantService) {}
 

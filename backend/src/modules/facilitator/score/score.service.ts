@@ -4,17 +4,23 @@ import { Repository } from 'typeorm';
 import { Score } from './score.entity';
 import { CreateScoreDto } from './dto/create-score.dto';
 import { UpdateScoreDto } from './dto/update-score.dto';
+import { FacilitatorGateway } from '../facilitator.gateway';
 
 @Injectable()
 export class ScoreService {
   constructor(
     @InjectRepository(Score)
     private scoreRepository: Repository<Score>,
+    private facilitatorGateway: FacilitatorGateway,
   ) {}
 
   async create(createScoreDto: CreateScoreDto): Promise<Score> {
     const score = this.scoreRepository.create(createScoreDto);
-    return this.scoreRepository.save(score);
+    const savedScore = await this.scoreRepository.save(score);
+    
+    this.facilitatorGateway.broadcastScoreUpdated(savedScore);
+    
+    return savedScore;
   }
 
   async findAll(): Promise<Score[]> {
@@ -44,7 +50,11 @@ export class ScoreService {
   async update(id: string, updateScoreDto: UpdateScoreDto): Promise<Score> {
     const score = await this.findOne(id);
     Object.assign(score, updateScoreDto);
-    return this.scoreRepository.save(score);
+    const updatedScore = await this.scoreRepository.save(score);
+    
+    this.facilitatorGateway.broadcastScoreUpdated(updatedScore);
+    
+    return updatedScore;
   }
 
   async remove(id: string): Promise<void> {

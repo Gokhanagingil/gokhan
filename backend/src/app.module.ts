@@ -1,17 +1,25 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ParticipantModule } from './modules/facilitator/participant/participant.module';
 import { EventModule } from './modules/facilitator/event/event.module';
 import { FeedbackModule } from './modules/facilitator/feedback/feedback.module';
 import { ScoreModule } from './modules/facilitator/score/score.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { SessionModule } from './modules/session/session.module';
+import { FacilitatorGateway } from './modules/facilitator/facilitator.gateway';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
+    ConfigModule.forRoot({ isGlobal: true }),
+    PassportModule,
+    JwtModule.register({
+      secret: process.env.JWT_SECRET || 'arctic-echo-secret',
+      signOptions: { expiresIn: '24h' },
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -23,12 +31,14 @@ import { ScoreModule } from './modules/facilitator/score/score.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
+    AuthModule,
+    SessionModule,
     ParticipantModule,
     EventModule,
     FeedbackModule,
     ScoreModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, FacilitatorGateway],
 })
 export class AppModule {}

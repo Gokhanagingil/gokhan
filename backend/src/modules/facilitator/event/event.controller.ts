@@ -8,15 +8,19 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { EventService } from './event.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { Event } from './event.entity';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 
 @ApiTags('events')
 @Controller('events')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 export class EventController {
   constructor(private readonly eventService: EventService) {}
 
