@@ -1,7 +1,14 @@
 import { DataSource } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { Participant, ParticipantStatus } from '../modules/facilitator/participant/participant.entity';
-import { Event, EventType, EventStatus } from '../modules/facilitator/event/event.entity';
+import {
+  Participant,
+  ParticipantStatus,
+} from '../modules/facilitator/participant/participant.entity';
+import {
+  Event,
+  EventType,
+  EventStatus,
+} from '../modules/facilitator/event/event.entity';
 import { Feedback } from '../modules/facilitator/feedback/feedback.entity';
 import { Score } from '../modules/facilitator/score/score.entity';
 import { User, UserRole } from '../modules/auth/user.entity';
@@ -48,7 +55,8 @@ export async function seedDatabase(dataSource: DataSource) {
     {
       type: EventType.INCIDENT,
       title: 'Production Server Outage',
-      description: 'Main production server is experiencing downtime affecting all users',
+      description:
+        'Main production server is experiencing downtime affecting all users',
       triggeredAt: new Date(),
       status: EventStatus.OPEN,
     },
@@ -120,9 +128,9 @@ export async function runSeed() {
   try {
     await dataSource.initialize();
     console.log('📡 Database connection established');
-    
+
     await seedDatabase(dataSource);
-    
+
     await dataSource.destroy();
     console.log('📡 Database connection closed');
   } catch (error) {
@@ -132,5 +140,5 @@ export async function runSeed() {
 }
 
 if (require.main === module) {
-  runSeed();
+  void runSeed();
 }

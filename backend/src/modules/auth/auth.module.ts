@@ -12,7 +12,7 @@ import { JwtStrategy } from './jwt.strategy';
     TypeOrmModule.forFeature([User]),
     PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'arctic-echo-secret',
+      secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '24h' },
     }),
   ],

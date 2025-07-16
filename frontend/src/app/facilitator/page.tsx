@@ -49,7 +49,7 @@ interface Event extends Omit<ApiEvent, 'triggeredAt'> {
   triggerTime: string;
 }
 
-const API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = 'http://localhost:3001/api';
 
 const socket: Socket = io('http://localhost:3001');
 
@@ -76,29 +76,80 @@ const formatTriggerTime = (dateString: string): string => {
   });
 };
 
+
+const autoLogin = async (): Promise<string> => {
+  const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      email: process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'admin@arctic-echo.com',
+      password: process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'admin123',
+    }),
+  });
+  if (!response.ok) throw new Error('Auto-login failed');
+  const data = await response.json();
+  localStorage.setItem('token', data.token);
+  return data.token;
+};
+
 const fetchParticipants = async (): Promise<ApiParticipant[]> => {
-  const response = await fetch(`${API_BASE_URL}/participants`);
+  let token = localStorage.getItem('token');
+  if (!token) {
+    token = await autoLogin();
+  }
+  
+  const response = await fetch(`${API_BASE_URL}/participants`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
   if (!response.ok) throw new Error('Failed to fetch participants');
   return response.json();
 };
 
 const fetchEvents = async (): Promise<ApiEvent[]> => {
-  const response = await fetch(`${API_BASE_URL}/events`);
+  let token = localStorage.getItem('token');
+  if (!token) {
+    token = await autoLogin();
+  }
+  
+  const response = await fetch(`${API_BASE_URL}/events`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
   if (!response.ok) throw new Error('Failed to fetch events');
   return response.json();
 };
 
 const fetchScores = async (): Promise<ApiScore[]> => {
-  const response = await fetch(`${API_BASE_URL}/scores`);
+  let token = localStorage.getItem('token');
+  if (!token) {
+    token = await autoLogin();
+  }
+  
+  const response = await fetch(`${API_BASE_URL}/scores`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
   if (!response.ok) throw new Error('Failed to fetch scores');
   return response.json();
 };
 
 const sendFeedback = async (participantId: string, message: string): Promise<ApiFeedback> => {
+  let token = localStorage.getItem('token');
+  if (!token) {
+    token = await autoLogin();
+  }
+  
   const response = await fetch(`${API_BASE_URL}/feedback`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
     },
     body: JSON.stringify({
       participantId,
@@ -121,17 +172,16 @@ export default function FacilitatorDashboard() {
   const [selectedParticipant, setSelectedParticipant] = useState('all');
   const [sendingFeedback, setSendingFeedback] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const [participantsData, eventsData, scoresData] = await Promise.all([
-          fetchParticipants(),
-          fetchEvents(),
-          fetchScores(),
-        ]);
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const [participantsData, eventsData, scoresData] = await Promise.all([
+        fetchParticipants(),
+        fetchEvents(),
+        fetchScores(),
+      ]);
         
         const scoresByParticipant = scoresData.reduce((acc, score) => {
           if (!acc[score.participantId]) {
@@ -154,17 +204,29 @@ export default function FacilitatorDashboard() {
           triggerTime: formatTriggerTime(e.triggeredAt),
         }));
         
-        setParticipants(transformedParticipants);
-        setEvents(transformedEvents);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch data');
-        console.error('Error fetching data:', err);
-      } finally {
-        setLoading(false);
+      setParticipants(transformedParticipants);
+      setEvents(transformedEvents);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch data');
+      console.error('Error fetching data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const initializeAuth = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        try {
+          await autoLogin();
+        } catch (error) {
+          console.error('Auto-login failed:', error);
+        }
       }
     };
     
-    fetchData();
+    initializeAuth().then(() => fetchData());
   }, []);
 
   useEffect(() => {

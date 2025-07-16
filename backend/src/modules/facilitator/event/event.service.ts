@@ -17,9 +17,9 @@ export class EventService {
   async create(createEventDto: CreateEventDto): Promise<Event> {
     const event = this.eventRepository.create(createEventDto);
     const savedEvent = await this.eventRepository.save(event);
-    
+
     this.facilitatorGateway.broadcastNewEvent(savedEvent);
-    
+
     return savedEvent;
   }
 

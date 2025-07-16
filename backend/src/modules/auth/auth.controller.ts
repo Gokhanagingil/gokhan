@@ -1,5 +1,10 @@
 import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -14,7 +19,11 @@ export class AuthController {
 
   @Post('register')
   @ApiOperation({ summary: 'Register a new user' })
-  @ApiResponse({ status: 201, description: 'User registered successfully', type: User })
+  @ApiResponse({
+    status: 201,
+    description: 'User registered successfully',
+    type: User,
+  })
   register(@Body() registerDto: RegisterDto): Promise<User> {
     return this.authService.register(registerDto);
   }
@@ -33,7 +42,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Get current user profile' })
   @ApiResponse({ status: 200, description: 'User profile', type: User })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  me(@GetUser() user: User): Promise<User> {
+  me(@GetUser() user: User): User {
     return this.authService.me(user);
   }
 }
