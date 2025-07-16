@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -16,14 +17,18 @@ import {
   ApiResponse,
   ApiParam,
   ApiQuery,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { FeedbackService } from './feedback.service';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 import { Feedback } from './feedback.entity';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 
 @ApiTags('feedback')
 @Controller('feedback')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 export class FeedbackController {
   constructor(private readonly feedbackService: FeedbackService) {}
 

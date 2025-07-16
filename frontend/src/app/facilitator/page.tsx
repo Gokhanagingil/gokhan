@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { io, Socket } from 'socket.io-client';
 
 interface ApiParticipant {
   id: string;
@@ -49,6 +50,8 @@ interface Event extends Omit<ApiEvent, 'triggeredAt'> {
 }
 
 const API_BASE_URL = 'http://localhost:3001';
+
+const socket: Socket = io('http://localhost:3001');
 
 const formatRelativeTime = (dateString: string): string => {
   const date = new Date(dateString);
@@ -162,6 +165,34 @@ export default function FacilitatorDashboard() {
     };
     
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    socket.on('new-participant', (participant) => {
+      setParticipants(prev => [...prev, participant]);
+      console.log('New participant added:', participant);
+    });
+
+    socket.on('new-event', (event) => {
+      setEvents(prev => [...prev, event]);
+      console.log('New event triggered:', event);
+    });
+
+    socket.on('score-updated', (score) => {
+      console.log('Score updated:', score);
+      fetchData();
+    });
+
+    socket.on('session-update', (session) => {
+      console.log('Session updated:', session);
+    });
+
+    return () => {
+      socket.off('new-participant');
+      socket.off('new-event');
+      socket.off('score-updated');
+      socket.off('session-update');
+    };
   }, []);
 
   // Timer countdown effect

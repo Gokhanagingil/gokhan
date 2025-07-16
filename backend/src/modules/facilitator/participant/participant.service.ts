@@ -4,19 +4,25 @@ import { Repository } from 'typeorm';
 import { Participant } from './participant.entity';
 import { CreateParticipantDto } from './dto/create-participant.dto';
 import { UpdateParticipantDto } from './dto/update-participant.dto';
+import { FacilitatorGateway } from '../facilitator.gateway';
 
 @Injectable()
 export class ParticipantService {
   constructor(
     @InjectRepository(Participant)
     private participantRepository: Repository<Participant>,
+    private facilitatorGateway: FacilitatorGateway,
   ) {}
 
   async create(
     createParticipantDto: CreateParticipantDto,
   ): Promise<Participant> {
     const participant = this.participantRepository.create(createParticipantDto);
-    return this.participantRepository.save(participant);
+    const savedParticipant = await this.participantRepository.save(participant);
+    
+    this.facilitatorGateway.broadcastNewParticipant(savedParticipant);
+    
+    return savedParticipant;
   }
 
   async findAll(): Promise<Participant[]> {
