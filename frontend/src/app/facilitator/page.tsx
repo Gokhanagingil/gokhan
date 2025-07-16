@@ -50,9 +50,7 @@ interface Event extends Omit<ApiEvent, 'triggeredAt'> {
 }
 
 const API_BASE_URL = 'http://localhost:3001/api';
-<<<<<<< HEAD
 
-=======
 const socket: Socket = io('http://localhost:3001');
 
 const formatRelativeTime = (dateString: string): string => {
@@ -96,14 +94,11 @@ const autoLogin = async (): Promise<string> => {
 };
 
 const fetchParticipants = async (): Promise<ApiParticipant[]> => {
-<<<<<<< HEAD
   let token = localStorage.getItem('token');
   if (!token) {
     token = await autoLogin();
   }
   
-=======
-  const token = localStorage.getItem('token');
   const response = await fetch(`${API_BASE_URL}/participants`, {
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -114,14 +109,11 @@ const fetchParticipants = async (): Promise<ApiParticipant[]> => {
 };
 
 const fetchEvents = async (): Promise<ApiEvent[]> => {
-<<<<<<< HEAD
   let token = localStorage.getItem('token');
   if (!token) {
     token = await autoLogin();
   }
   
-=======
-  const token = localStorage.getItem('token');
   const response = await fetch(`${API_BASE_URL}/events`, {
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -132,14 +124,11 @@ const fetchEvents = async (): Promise<ApiEvent[]> => {
 };
 
 const fetchScores = async (): Promise<ApiScore[]> => {
-<<<<<<< HEAD
   let token = localStorage.getItem('token');
   if (!token) {
     token = await autoLogin();
   }
   
-=======
-  const token = localStorage.getItem('token');
   const response = await fetch(`${API_BASE_URL}/scores`, {
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -150,14 +139,11 @@ const fetchScores = async (): Promise<ApiScore[]> => {
 };
 
 const sendFeedback = async (participantId: string, message: string): Promise<ApiFeedback> => {
-<<<<<<< HEAD
   let token = localStorage.getItem('token');
   if (!token) {
     token = await autoLogin();
   }
   
-=======
-  const token = localStorage.getItem('token');
   const response = await fetch(`${API_BASE_URL}/feedback`, {
     method: 'POST',
     headers: {
@@ -356,13 +342,11 @@ export default function FacilitatorDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Arctic Echo - Facilitator Dashboard</h1>
           <p className="text-gray-600">ITIL 4 & Agile Training Simulation Control Panel</p>
         </div>
 
-        {/* Main Grid Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* Left Column */}
