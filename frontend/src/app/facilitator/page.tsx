@@ -50,7 +50,9 @@ interface Event extends Omit<ApiEvent, 'triggeredAt'> {
 }
 
 const API_BASE_URL = 'http://localhost:3001/api';
+<<<<<<< HEAD
 
+=======
 const socket: Socket = io('http://localhost:3001');
 
 const formatRelativeTime = (dateString: string): string => {
@@ -58,7 +60,6 @@ const formatRelativeTime = (dateString: string): string => {
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffMins = Math.floor(diffMs / (1000 * 60));
-  
   if (diffMins < 1) return 'just now';
   if (diffMins < 60) return `${diffMins} min ago`;
   const diffHours = Math.floor(diffMins / 60);
@@ -69,10 +70,10 @@ const formatRelativeTime = (dateString: string): string => {
 
 const formatTriggerTime = (dateString: string): string => {
   const date = new Date(dateString);
-  return date.toLocaleTimeString('en-US', { 
-    hour: '2-digit', 
-    minute: '2-digit', 
-    hour12: false 
+  return date.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
   });
 };
 
@@ -95,11 +96,14 @@ const autoLogin = async (): Promise<string> => {
 };
 
 const fetchParticipants = async (): Promise<ApiParticipant[]> => {
+<<<<<<< HEAD
   let token = localStorage.getItem('token');
   if (!token) {
     token = await autoLogin();
   }
   
+=======
+  const token = localStorage.getItem('token');
   const response = await fetch(`${API_BASE_URL}/participants`, {
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -110,11 +114,14 @@ const fetchParticipants = async (): Promise<ApiParticipant[]> => {
 };
 
 const fetchEvents = async (): Promise<ApiEvent[]> => {
+<<<<<<< HEAD
   let token = localStorage.getItem('token');
   if (!token) {
     token = await autoLogin();
   }
   
+=======
+  const token = localStorage.getItem('token');
   const response = await fetch(`${API_BASE_URL}/events`, {
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -125,11 +132,14 @@ const fetchEvents = async (): Promise<ApiEvent[]> => {
 };
 
 const fetchScores = async (): Promise<ApiScore[]> => {
+<<<<<<< HEAD
   let token = localStorage.getItem('token');
   if (!token) {
     token = await autoLogin();
   }
   
+=======
+  const token = localStorage.getItem('token');
   const response = await fetch(`${API_BASE_URL}/scores`, {
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -140,21 +150,21 @@ const fetchScores = async (): Promise<ApiScore[]> => {
 };
 
 const sendFeedback = async (participantId: string, message: string): Promise<ApiFeedback> => {
+<<<<<<< HEAD
   let token = localStorage.getItem('token');
   if (!token) {
     token = await autoLogin();
   }
   
+=======
+  const token = localStorage.getItem('token');
   const response = await fetch(`${API_BASE_URL}/feedback`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
     },
-    body: JSON.stringify({
-      participantId,
-      message,
-    }),
+    body: JSON.stringify({ participantId, message }),
   });
   if (!response.ok) throw new Error('Failed to send feedback');
   return response.json();
