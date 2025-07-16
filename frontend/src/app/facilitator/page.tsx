@@ -49,9 +49,29 @@ interface Event extends Omit<ApiEvent, 'triggeredAt'> {
   triggerTime: string;
 }
 
-const API_BASE_URL = 'http://localhost:3001/api';
+const getApiBaseUrl = () => {
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname.includes('facilitator-api-tunnel-vzlas80k.devinapps.com')) {
+      return 'https://user:94ed5d750a58fcf987d77aa63903e1a3@facilitator-api-tunnel-3oa404pb.devinapps.com/api';
+    }
+  }
+  return 'http://localhost:3001/api';
+};
 
-const socket: Socket = io('http://localhost:3001');
+const getSocketUrl = () => {
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname.includes('facilitator-api-tunnel-vzlas80k.devinapps.com')) {
+      return 'https://user:94ed5d750a58fcf987d77aa63903e1a3@facilitator-api-tunnel-3oa404pb.devinapps.com';
+    }
+  }
+  return 'http://localhost:3001';
+};
+
+const API_BASE_URL = getApiBaseUrl();
+
+const socket: Socket = io(getSocketUrl());
 
 const formatRelativeTime = (dateString: string): string => {
   const date = new Date(dateString);
