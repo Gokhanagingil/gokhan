@@ -13,7 +13,7 @@ export class SessionService {
   async start(): Promise<Session> {
     await this.sessionRepository.update(
       { status: SessionStatus.ACTIVE },
-      { status: SessionStatus.STOPPED, endedAt: new Date() }
+      { status: SessionStatus.STOPPED, endedAt: new Date() },
     );
 
     const session = this.sessionRepository.create({

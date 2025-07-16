@@ -19,9 +19,9 @@ export class ParticipantService {
   ): Promise<Participant> {
     const participant = this.participantRepository.create(createParticipantDto);
     const savedParticipant = await this.participantRepository.save(participant);
-    
+
     this.facilitatorGateway.broadcastNewParticipant(savedParticipant);
-    
+
     return savedParticipant;
   }
 

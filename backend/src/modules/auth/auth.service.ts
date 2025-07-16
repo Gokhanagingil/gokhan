@@ -24,16 +24,17 @@ export class AuthService {
     return this.userRepository.save(user);
   }
 
-  async login(loginDto: LoginDto): Promise<{ access_token: string; user: User }> {
-    const user = await this.userRepository.findOne({ where: { email: loginDto.email } });
+  async login(loginDto: LoginDto): Promise<{ token: string }> {
+    const user = await this.userRepository.findOne({
+      where: { email: loginDto.email },
+    });
     if (!user || !(await bcrypt.compare(loginDto.password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    
+
     const payload = { email: user.email, sub: user.id, role: user.role };
     return {
-      access_token: this.jwtService.sign(payload),
-      user,
+      token: this.jwtService.sign(payload),
     };
   }
 
@@ -41,7 +42,7 @@ export class AuthService {
     return this.userRepository.findOne({ where: { id } });
   }
 
-  async me(user: User): Promise<User> {
+  me(user: User): User {
     return user;
   }
 }

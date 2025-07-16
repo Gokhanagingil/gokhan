@@ -17,9 +17,9 @@ export class ScoreService {
   async create(createScoreDto: CreateScoreDto): Promise<Score> {
     const score = this.scoreRepository.create(createScoreDto);
     const savedScore = await this.scoreRepository.save(score);
-    
+
     this.facilitatorGateway.broadcastScoreUpdated(savedScore);
-    
+
     return savedScore;
   }
 
@@ -51,9 +51,9 @@ export class ScoreService {
     const score = await this.findOne(id);
     Object.assign(score, updateScoreDto);
     const updatedScore = await this.scoreRepository.save(score);
-    
+
     this.facilitatorGateway.broadcastScoreUpdated(updatedScore);
-    
+
     return updatedScore;
   }
 

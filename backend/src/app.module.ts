@@ -11,6 +11,7 @@ import { FeedbackModule } from './modules/facilitator/feedback/feedback.module';
 import { ScoreModule } from './modules/facilitator/score/score.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { SessionModule } from './modules/session/session.module';
+import { SeedModule } from './modules/facilitator/seed/seed.module';
 import { FacilitatorGateway } from './modules/facilitator/facilitator.gateway';
 
 @Module({
@@ -18,7 +19,7 @@ import { FacilitatorGateway } from './modules/facilitator/facilitator.gateway';
     ConfigModule.forRoot({ isGlobal: true }),
     PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'arctic-echo-secret',
+      secret: process.env.JWT_SECRET!,
       signOptions: { expiresIn: '24h' },
     }),
     TypeOrmModule.forRoot({
@@ -33,6 +34,7 @@ import { FacilitatorGateway } from './modules/facilitator/facilitator.gateway';
     }),
     AuthModule,
     SessionModule,
+    SeedModule,
     ParticipantModule,
     EventModule,
     FeedbackModule,
