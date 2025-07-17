@@ -52,8 +52,8 @@ interface Event extends Omit<ApiEvent, 'triggeredAt'> {
 const getApiBaseUrl = () => {
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
-    if (hostname.includes('facilitator-api-tunnel-vzlas80k.devinapps.com')) {
-      return 'https://user:94ed5d750a58fcf987d77aa63903e1a3@facilitator-api-tunnel-3oa404pb.devinapps.com/api';
+    if (hostname.includes('devinapps.com')) {
+      return 'https://facilitator-api-tunnel-k5pz34xq.devinapps.com/api';
     }
   }
   return 'http://localhost:3001/api';
@@ -62,8 +62,8 @@ const getApiBaseUrl = () => {
 const getSocketUrl = () => {
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
-    if (hostname.includes('facilitator-api-tunnel-vzlas80k.devinapps.com')) {
-      return 'https://user:94ed5d750a58fcf987d77aa63903e1a3@facilitator-api-tunnel-3oa404pb.devinapps.com';
+    if (hostname.includes('devinapps.com')) {
+      return 'https://facilitator-api-tunnel-k5pz34xq.devinapps.com';
     }
   }
   return 'http://localhost:3001';

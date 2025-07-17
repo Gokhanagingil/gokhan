@@ -10,8 +10,10 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 @WebSocketGateway({
   cors: {
-    origin: ['http://localhost:3000', 'http://localhost:3002'],
+    origin: true,
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   },
 })
 export class FacilitatorGateway
