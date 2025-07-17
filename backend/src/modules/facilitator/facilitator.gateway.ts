@@ -16,6 +16,7 @@ import { Injectable } from '@nestjs/common';
       'https://facilitator-api-tunnel-niuqt6qz.devinapps.com',
       'https://facilitator-api-tunnel-v48eejzq.devinapps.com',
       'https://facilitator-api-tunnel-i8ifhtwb.devinapps.com',
+      'https://facilitator-api-tunnel-rfg8w6i1.devinapps.com',
       /^https:\/\/.*\.devinapps\.com$/
     ],
     credentials: true,
