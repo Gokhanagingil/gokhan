@@ -17,6 +17,7 @@ async function bootstrap() {
       'https://facilitator-api-tunnel-dncpgg7y.devinapps.com',
       'https://facilitator-api-tunnel-jn8wpfc6.devinapps.com',
       'https://facilitator-api-tunnel-v48eejzq.devinapps.com',
+      'https://facilitator-api-tunnel-i8ifhtwb.devinapps.com',
       /^https:\/\/.*\.devinapps\.com$/
     ],
     credentials: true,
