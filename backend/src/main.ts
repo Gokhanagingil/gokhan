@@ -12,6 +12,7 @@ async function bootstrap() {
     origin: [
       'http://localhost:3000',
       'https://facilitator-api-tunnel-g5myx7qk.devinapps.com',
+      'https://facilitator-api-tunnel-niuqt6qz.devinapps.com',
       /^https:\/\/.*\.devinapps\.com$/
     ],
     credentials: true,
