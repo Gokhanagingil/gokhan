@@ -9,12 +9,7 @@ async function bootstrap() {
   });
 
   app.enableCors({
-    origin: [
-      'http://localhost:3000',
-      'https://facilitator-api-tunnel-w4816puo.devinapps.com',
-      'https://facilitator-api-tunnel-2v9vafjv.devinapps.com',
-      /https:\/\/.*\.devinapps\.com$/
-    ],
+    origin: true,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
