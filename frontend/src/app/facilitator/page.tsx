@@ -53,7 +53,7 @@ const getApiBaseUrl = () => {
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
     if (hostname.includes('devinapps.com')) {
-      return 'https://facilitator-api-tunnel-k5pz34xq.devinapps.com/api';
+      return 'https://user:21cb08d542ec97f3c084533f9c87b57f@facilitator-api-tunnel-k5pz34xq.devinapps.com/api';
     }
   }
   return 'http://localhost:3001/api';
@@ -63,7 +63,7 @@ const getSocketUrl = () => {
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
     if (hostname.includes('devinapps.com')) {
-      return 'https://facilitator-api-tunnel-k5pz34xq.devinapps.com';
+      return 'https://user:21cb08d542ec97f3c084533f9c87b57f@facilitator-api-tunnel-k5pz34xq.devinapps.com';
     }
   }
   return 'http://localhost:3001';
