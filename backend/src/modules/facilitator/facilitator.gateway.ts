@@ -13,6 +13,7 @@ import { Injectable } from '@nestjs/common';
     origin: [
       'http://localhost:3000',
       'https://facilitator-api-tunnel-sumlaml5.devinapps.com',
+      'https://facilitator-api-tunnel-w4816puo.devinapps.com',
       /^https:\/\/.*\.devinapps\.com$/
     ],
     credentials: true,
