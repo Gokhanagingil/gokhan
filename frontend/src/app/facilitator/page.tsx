@@ -69,6 +69,18 @@ const getSocketUrl = () => {
   return 'http://localhost:3001';
 };
 
+const getAuthHeaders = () => {
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname.includes('devinapps.com')) {
+      return {
+        'Authorization': 'Basic ' + btoa('user:21cb08d542ec97f3c084533f9c87b57f')
+      };
+    }
+  }
+  return {};
+};
+
 const API_BASE_URL = getApiBaseUrl();
 
 const socket: Socket = io(getSocketUrl());
@@ -97,10 +109,11 @@ const formatTriggerTime = (dateString: string): string => {
 
 
 const autoLogin = async (): Promise<string> => {
-  const response = await fetch(`${API_BASE_URL}/auth/login`, {
+  const response = await fetch(`${getApiBaseUrl()}/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      ...getAuthHeaders(),
     },
     body: JSON.stringify({
       email: process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'admin@arctic-echo.com',
@@ -109,8 +122,8 @@ const autoLogin = async (): Promise<string> => {
   });
   if (!response.ok) throw new Error('Auto-login failed');
   const data = await response.json();
-  localStorage.setItem('token', data.token);
-  return data.token;
+  localStorage.setItem('token', data.access_token);
+  return data.access_token;
 };
 
 const fetchParticipants = async (): Promise<ApiParticipant[]> => {
@@ -119,9 +132,10 @@ const fetchParticipants = async (): Promise<ApiParticipant[]> => {
     token = await autoLogin();
   }
   
-  const response = await fetch(`${API_BASE_URL}/participants`, {
+  const response = await fetch(`${getApiBaseUrl()}/participants`, {
     headers: {
       'Authorization': `Bearer ${token}`,
+      ...getAuthHeaders(),
     },
   });
   if (!response.ok) throw new Error('Failed to fetch participants');
@@ -134,9 +148,10 @@ const fetchEvents = async (): Promise<ApiEvent[]> => {
     token = await autoLogin();
   }
   
-  const response = await fetch(`${API_BASE_URL}/events`, {
+  const response = await fetch(`${getApiBaseUrl()}/events`, {
     headers: {
       'Authorization': `Bearer ${token}`,
+      ...getAuthHeaders(),
     },
   });
   if (!response.ok) throw new Error('Failed to fetch events');
@@ -149,9 +164,10 @@ const fetchScores = async (): Promise<ApiScore[]> => {
     token = await autoLogin();
   }
   
-  const response = await fetch(`${API_BASE_URL}/scores`, {
+  const response = await fetch(`${getApiBaseUrl()}/scores`, {
     headers: {
       'Authorization': `Bearer ${token}`,
+      ...getAuthHeaders(),
     },
   });
   if (!response.ok) throw new Error('Failed to fetch scores');
@@ -164,11 +180,12 @@ const sendFeedback = async (participantId: string, message: string): Promise<Api
     token = await autoLogin();
   }
   
-  const response = await fetch(`${API_BASE_URL}/feedback`, {
+  const response = await fetch(`${getApiBaseUrl()}/feedback`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
+      ...getAuthHeaders(),
     },
     body: JSON.stringify({ participantId, message }),
   });
